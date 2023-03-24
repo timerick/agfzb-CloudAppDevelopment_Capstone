@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
-from djangoapp.restapis import get_request, get_dealers_from_cf, get_dealer_by_id_from_cf, get_dealer_reviews_from_cf
+from djangoapp.restapis import get_request, post_request, get_dealers_from_cf, get_dealer_by_id_from_cf, get_dealer_reviews_from_cf
 from .models import CarDealer, CarMake, DealerReview, CarModel
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
@@ -140,7 +140,7 @@ def add_review(request, id):
                 if request.POST["purchasecheck"] == 'on':
                     payload["purchase"] = True
             payload["purchase_date"] = request.POST["purchasedate"]
-            payload["car_make"] = car.make.name  
+            payload["car_make"] = car.car_make
             payload["car_model"] = car.name
             payload["car_year"] = int(car.year.strftime("%Y"))
 

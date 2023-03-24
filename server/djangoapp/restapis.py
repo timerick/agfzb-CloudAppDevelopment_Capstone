@@ -27,7 +27,19 @@ def get_request(url, **kwargs):
 
 # Create a `post_request` to make HTTP POST requests
 # e.g., response = requests.post(url, params=kwargs, json=payload)
-
+def post_request(url, payload, **kwargs):
+    status_code = None
+    print(kwargs)
+    print("POST to {} ".format(url))
+    print(payload)
+    try:
+        response = requests.post(url, params=kwargs, json=payload, headers={'Content-Type': 'application/json'},
+                                    auth=HTTPBasicAuth('apikey','api_key'))
+    except:
+        status_code = response.status_code
+    print("With status {} ".format(status_code))
+    json_data = json.loads(response.text)
+    return json_data
 
 # Create a get_dealers_from_cf method to get dealers from a cloud function
 # def get_dealers_from_cf(url, **kwargs):
@@ -84,34 +96,20 @@ def get_dealer_reviews_from_cf(url, **kwargs):
         json_result = get_request(url)
     if json_result:
         reviews = json_result["data"]["docs"]
-        for review in reviews:
-            if review["purchase"]:
+        for dealer_review in reviews:
                 review_obj = DealerReview(
-                    dealership=review["dealership"],
-                    name=review["name"],
-                    purchase=review["purchase"],
-                    review=review["review"],
-                    purchase_date=review["purchase_date"],
-                    car_make=review["car_make"],
-                    car_model=review["car_model"],
-                    car_year=review["car_year"],
-                    sentiment=analyze_review_sentiments(review["review"]),
-                    id=review['id']
+                    dealership=dealer_review["dealership"],
+                    name=dealer_review["name"],
+                    purchase=dealer_review["purchase"],
+                    review=dealer_review["review"],
+                    purchase_date=dealer_review["purchase_date"],
+                    car_make=dealer_review["car_make"],
+                    car_model=dealer_review["car_model"],
+                    car_year=dealer_review["car_year"],
+                    sentiment=analyze_review_sentiments(dealer_review["review"]),
+                    id=dealer_review['id']
                 )
-            else:
-                review_obj = DealerReview(
-                    dealership=review["dealership"],
-                    name=review["name"],
-                    purchase=review["purchase"],
-                    review=review["review"],
-                    purchase_date=None,
-                    car_make=None,
-                    car_model=None,
-                    car_year=None,
-                    sentiment=analyze_review_sentiments(review["review"]),
-                    id=review['id']
-                )
-            results.append(review_obj)
+        results.append(review_obj)
     return results
  
 def analyze_review_sentiments(text):

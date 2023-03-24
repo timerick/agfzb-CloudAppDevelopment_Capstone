@@ -12,7 +12,7 @@
     WORKDIR $APP
 
     # Install the requirements
-    COPY requirements.txt $APP
+    COPY server/requirements.txt $APP
 
     RUN pip3 install -r requirements.txt
 
